@@ -1,6 +1,5 @@
 require('dotenv').config()
 const express = require('express')
-const mongoose = require('mongoose')
 const app = express()
 const cors = require('cors')
 const Note = require('./models/note')
@@ -92,7 +91,7 @@ app.get('/api/notes/:id', (request, response, next) => {
 app.delete('/api/notes/:id', (request, response, next) => {
   const id = request.params.id
   Note.findByIdAndDelete(id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -161,7 +160,7 @@ app.use(errorHandler)
 
 
 // runing Port
-const PORT = process.env.PORT
+const PORT = process.env.PORT_NOTEAPP
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
