@@ -5,11 +5,16 @@ const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Note = require('../models/note')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 describe('when there is initially some notes saved', () => {
+  let userId = ''
   beforeEach(async () => {
+    await User.deleteMany({})
+    userId = (await (await helper.initialUsers()).save()).id
+    console.log('userrrrrrrrIddddddddd',userId)
     await Note.deleteMany({})
     await Note.insertMany(helper.initialNotes)
   })
@@ -65,8 +70,9 @@ describe('when there is initially some notes saved', () => {
       const newNote = {
         content: 'async/await simplifies making async calls',
         important: true,
+        userId: userId,
       }
-
+      console.log('before await api...', userId)
       await api
         .post('/api/notes')
         .send(newNote)
