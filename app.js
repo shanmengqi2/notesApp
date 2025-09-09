@@ -61,10 +61,16 @@ const corsOptions = {
       'https://localhost:5173'
     ]
 
-    // Production environment - you might want to add your production domain
+    // Production environment - allow vercel.app domains for learning projects
     if (process.env.NODE_ENV === 'production') {
-      // Add your production frontend URL here when deployed
-      // allowedOrigins.push('https://your-frontend-domain.com')
+      // Allow specific known frontend domains
+      allowedOrigins.push('https://introdemo.vercel.app')
+
+      // For learning projects, also allow other vercel.app subdomains
+      if (origin && origin.endsWith('.vercel.app')) {
+        logger.info('Allowing vercel.app subdomain:', origin)
+        return callback(null, true)
+      }
     }
 
     if (allowedOrigins.indexOf(origin) !== -1) {
@@ -74,7 +80,9 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'))
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }
 
 app.use(cors(corsOptions))
