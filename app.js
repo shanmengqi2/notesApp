@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 const mongoose = require('mongoose')
 const config = require('./utils/config')
 const logger = require('./utils/logger')
@@ -43,6 +44,40 @@ mongoose.connection.on('disconnected', () => {
 })
 
 app.use(express.static('dist'))
+
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true)
+
+    // Development environment - allow localhost with common ports
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:5173',
+      'http://localhost:8080',
+      'https://localhost:3000',
+      'https://localhost:5173'
+    ]
+
+    // Production environment - you might want to add your production domain
+    if (process.env.NODE_ENV === 'production') {
+      // Add your production frontend URL here when deployed
+      // allowedOrigins.push('https://your-frontend-domain.com')
+    }
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      logger.info('CORS blocked origin:', origin)
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true
+}
+
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(middleware.requestLogger)
 
